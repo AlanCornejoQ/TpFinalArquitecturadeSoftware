@@ -24,7 +24,15 @@ def crear_reserva_view(request):
 
         return JsonResponse({
             "mensaje": "Reserva creada",
-            "reserva": reserva.__dict__
+            "reserva": {
+                "id_reserva": reserva.id,
+                "id_usuario": reserva.usuario.id,
+                "id_espacio": reserva.espacio.id,
+                "fecha": reserva.fecha.isoformat(),
+                "hora_inicio": reserva.hora_inicio,
+                "hora_fin": reserva.hora_fin,
+                "estado": reserva.estado
+            }
         })
 
     except Exception as e:

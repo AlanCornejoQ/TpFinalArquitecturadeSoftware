@@ -1,24 +1,23 @@
-from domain.models.reserva import Reserva
+from infrastructure.models import Reserva, Usuario, Espacio
 from datetime import datetime
 
-id_reserva_actual = 1  # Simula un autoincremento simple
-
 def crear_reserva(datos: dict) -> Reserva:
-    global id_reserva_actual
-
     campos = ["id_usuario", "id_espacio", "fecha", "hora_inicio", "hora_fin"]
     for campo in campos:
         if campo not in datos:
             raise ValueError(f"Falta el campo obligatorio: {campo}")
 
-    reserva = Reserva(
-        id_reserva=id_reserva_actual,
-        id_usuario=datos["id_usuario"],
-        id_espacio=datos["id_espacio"],
+    # Obtener las instancias correspondientes
+    usuario = Usuario.objects.get(id=datos["id_usuario"])
+    espacio = Espacio.objects.get(id=datos["id_espacio"])
+
+    reserva = Reserva.objects.create(
+        usuario=usuario,
+        espacio=espacio,
         fecha=datos["fecha"],
         hora_inicio=datos["hora_inicio"],
-        hora_fin=datos["hora_fin"]
+        hora_fin=datos["hora_fin"],
+        estado="pendiente"
     )
 
-    id_reserva_actual += 1
     return reserva
