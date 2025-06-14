@@ -2,27 +2,37 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import unittest
+from django.test import TestCase
 from datetime import datetime
 from application.crear_reserva import crear_reserva
-from domain.models.reserva import Reserva
+from infrastructure.models import Usuario, Espacio, Reserva
+import uuid
 
-class CrearReservaTest(unittest.TestCase):
+class CrearReservaTest(TestCase):
+    def setUp(self):
+        self.usuario = Usuario.objects.create(
+            nombre="Alan",
+            email=f"{uuid.uuid4()}@example.com"
+        )
+        self.espacio = Espacio.objects.create(
+            nombre="Lab 1",
+            tipo="laboratorio",
+            capacidad=10,
+            disponible=True
+        )
+
     def test_crear_reserva_valida(self):
         datos = {
-            "id_usuario": 5,
-            "id_espacio": 2,
-            "fecha": datetime(2025, 6, 20),
-            "hora_inicio": "08:00",
-            "hora_fin": "10:00"
+            "id_usuario": self.usuario.id,
+            "id_espacio": self.espacio.id,
+            "fecha": datetime.strptime("2025-06-15", "%Y-%m-%d"),
+            "hora_inicio": "09:00",
+            "hora_fin": "11:00"
         }
 
         reserva = crear_reserva(datos)
 
         self.assertIsInstance(reserva, Reserva)
-        self.assertEqual(reserva.id_usuario, 5)
-        self.assertEqual(reserva.id_espacio, 2)
+        self.assertEqual(reserva.usuario.id, self.usuario.id)
+        self.assertEqual(reserva.espacio.id, self.espacio.id)
         self.assertEqual(reserva.estado, "pendiente")
-
-if __name__ == '__main__':
-    unittest.main()
